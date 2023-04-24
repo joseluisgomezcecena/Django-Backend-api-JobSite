@@ -6,6 +6,7 @@ from .serializers import JobSerializer
 
 from django.shortcuts import get_list_or_404, get_object_or_404
 from rest_framework import status
+from django.db.models import Avg, Count, Min, Sum, Max
 # Create your views here.
 
 
@@ -89,3 +90,24 @@ def deleteJob(request, pk):
     job.delete()
 
     return Response({'message': 'Job deleted successfully'}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def getTopicStats(request, topic):
+
+    args = {"title__icontains": topic}
+    jobs = Job.objects.filter(**args)
+
+    if len(jobs) == 0:
+        return Response({'message': f'Nothing found for {topic}'.format(topic=topic)}, status=status.HTTP_200_OK)
+
+    # Get the average salary
+    stats = jobs.aggregate(
+        total_jobs=Count('title'),
+        avg_positions=Avg('positions'),
+        min=Min('salary'),
+        max=Max('salary'),
+        avg_salary=Avg('avg_salary')
+    )
+
+    return Response(stats, status=status.HTTP_200_OK)
