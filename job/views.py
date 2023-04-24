@@ -7,22 +7,37 @@ from .serializers import JobSerializer
 from django.shortcuts import get_list_or_404, get_object_or_404
 from rest_framework import status
 from django.db.models import Avg, Count, Min, Sum, Max
+from .filters import JobFilter
+from rest_framework.pagination import PageNumberPagination
+
+
 # Create your views here.
 
 
 @api_view(['GET'])
 def getAllJobs(request):
+    # jobs = Job.objects.all()
 
-    jobs = Job.objects.all()
+    filters = JobFilter(request.GET, queryset=Job.objects.all().order_by('-id'))
 
-    serializer = JobSerializer(jobs, many=True)
-    return Response(serializer.data)
+    count = filters.qs.count()
+
+    # pagination
+    results_per_page = 10
+    paginator = PageNumberPagination()
+    paginator.page_size = results_per_page
+
+    queryset = paginator.paginate_queryset(filters.qs, request)
+
+    serializer = JobSerializer(queryset, many=True)
+
+    # return Response(serializer.data)
+    return Response({'count': count, 'resPerPage': results_per_page, 'jobs': serializer.data})
 
 
 @api_view(['GET'])
 def getJob(request, pk):
-
-    #job = Job.objects.get(id=pk)
+    # job = Job.objects.get(id=pk)
     job = get_object_or_404(Job, id=pk)
 
     serializer = JobSerializer(job, many=False)
@@ -31,7 +46,6 @@ def getJob(request, pk):
 
 @api_view(['POST'])
 def createJob(request):
-
     data = request.data
 
     job = Job.objects.create(**data)
@@ -53,10 +67,8 @@ def createJob(request):
     return Response(serializer.data)
 
 
-
 @api_view(['PUT'])
 def updateJob(request, pk):
-
     job = get_object_or_404(Job, id=pk)
 
     job.title = request.data['title']
@@ -73,9 +85,9 @@ def updateJob(request, pk):
     job.city = request.data['city']
     job.state = request.data['state']
     job.country = request.data['country']
-    #job.last_date = request.data['last_date']
-    #job.point = request.data['point']
-    #job.user = request.data['user']
+    # job.last_date = request.data['last_date']
+    # job.point = request.data['point']
+    # job.user = request.data['user']
 
     job.save()
 
@@ -85,7 +97,6 @@ def updateJob(request, pk):
 
 @api_view(['DELETE'])
 def deleteJob(request, pk):
-
     job = get_object_or_404(Job, id=pk)
     job.delete()
 
@@ -94,7 +105,6 @@ def deleteJob(request, pk):
 
 @api_view(['GET'])
 def getTopicStats(request, topic):
-
     args = {"title__icontains": topic}
     jobs = Job.objects.filter(**args)
 
