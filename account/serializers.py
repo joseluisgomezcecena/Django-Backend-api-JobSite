@@ -21,7 +21,9 @@ class SingUpSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+
+    resume = serializers.CharField(source='userprofile.resume', allow_blank=True, allow_null=True)
+
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'email', 'username')
-
+        fields = ('first_name', 'last_name', 'email', 'username', 'resume')
