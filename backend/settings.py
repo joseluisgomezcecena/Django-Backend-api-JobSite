@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     'rest_framework',
 
     'job.apps.JobConfig',
-    'accounts.apps.AccountsConfig',
+    'account.apps.AccountConfig',
 
 ]
 
