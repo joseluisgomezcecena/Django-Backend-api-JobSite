@@ -26,7 +26,7 @@ dotenv.read_dotenv()
 SECRET_KEY = 'django-insecure-%iqn_ouys2u@*kjw(f-_%%1#p+wz4gg(6s_9!%9r9(^2&+&v%h'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['localhost']
 
@@ -121,6 +121,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 REST_FRAMEWORK = {
+    'EXCEPTION_HANDLER': 'utils.custom_exception_handler.custom_exception_handler',
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
