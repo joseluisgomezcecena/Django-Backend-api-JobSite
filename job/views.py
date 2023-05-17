@@ -139,7 +139,6 @@ def getTopicStats(request, topic):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def applyToJob(request, pk):
-
     user = request.user
     job = get_object_or_404(Job, id=pk)
 
@@ -159,7 +158,6 @@ def applyToJob(request, pk):
 
     # alreadyApplied = job.candidates_applied.filter(user=user).exists()
     alreadyApplied = CandidatesApplied.objects.filter(user=user, job=job).exists()
-
 
     if alreadyApplied:
         return Response({'message': 'You have already applied to this job'}, status=status.HTTP_400_BAD_REQUEST)
@@ -193,14 +191,12 @@ def getAppliedJobs(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def isApplied(request, pk):
-
     user = request.user
     job = get_object_or_404(Job, id=pk)
 
     applied = job.candidatesapplied_set.filter(user=user).exists()
 
     return Response({'applied': applied}, status=status.HTTP_200_OK)
-
 
 
 @api_view(['GET'])
@@ -214,6 +210,17 @@ def getCurrentUserPostedJobs(request):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def getCandidatesAppliedToJobs(request, pk):
+    user = request.user
+    job = get_object_or_404(Job, id=pk)
 
+    if job.user != user:
+        return Response({'message': 'You are not authorized to view this job'}, status=status.HTTP_403_FORBIDDEN)
 
+    candidates = job.candidatesapplied_set.all()
 
+    serializer = CandidatesAppliedSerializer(candidates, many=True)
+
+    return Response(serializer.data, status=status.HTTP_200_OK)
