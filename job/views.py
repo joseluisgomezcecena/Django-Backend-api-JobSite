@@ -190,6 +190,28 @@ def getAppliedJobs(request):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def isApplied(request, pk):
+
+    user = request.user
+    job = get_object_or_404(Job, id=pk)
+
+    applied = job.candidatesapplied_set.filter(user=user).exists()
+
+    return Response({'applied': applied}, status=status.HTTP_200_OK)
+
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def getCurrentUserPostedJobs(request):
+    args = {'user_id': request.user.id}
+    jobs = Job.objects.filter(**args)
+
+    serializer = JobSerializer(jobs, many=True)
+
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 

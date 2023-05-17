@@ -10,6 +10,7 @@ urlpatterns = [
 
     path('jobs/apply/<str:pk>/', views.applyToJob, name="apply-job"),
     path('me/jobs/applied', views.getAppliedJobs, name="applied-jobs"),
+    path('jobs/check/<str:pk>/', views.isApplied, name="is-applied"),
 
     path('stats/<str:topic>/', views.getTopicStats, name="stats"),
 ]
